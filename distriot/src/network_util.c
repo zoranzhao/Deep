@@ -220,6 +220,7 @@ void start_service_for_n_times(int sockfd, ctrl_proto proto, const char* handler
       if(proto == TCP){
          close(newsockfd);     
       }
+      free(conn);
       /*Close connection*/
    }
 }
@@ -267,6 +268,7 @@ void start_service(int sockfd, ctrl_proto proto, const char* handler_name[], uin
       if(proto == TCP){
          close(newsockfd);     
       }
+      free(conn);
       /*Close connection*/
    }
    /*This should not be called, users must explicitly call void close_service_connection(conn)*/

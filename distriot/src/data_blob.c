@@ -52,11 +52,14 @@ blob* new_empty_blob(int32_t id)
 void free_blob(blob* temp){
    if(temp->meta_size > 0){
       free(temp->meta);
+      temp->meta = NULL;
    }
    if((temp->data != NULL)&&(temp->free_data==1)){
       free(temp->data);
+      temp->data = NULL;
    }
    free(temp);
+   temp = NULL;
 }
 
 blob* write_file_to_blob(const char *filename){
@@ -89,14 +92,18 @@ void write_blob_to_file(const char *filename, blob* temp){
 }
 
 void fill_blob_meta(blob* temp, uint32_t meta_size, uint8_t* meta){
-   if(temp->meta_size > 0) free(temp->meta);
+   if(temp->meta_size > 0) {
+       free(temp->meta);
+   }
    temp->meta = (uint8_t*)malloc(sizeof(uint8_t)*meta_size);
    temp->meta_size = meta_size;
    memcpy(temp->meta, meta, meta_size);
 }
 
 void copy_blob_meta(blob* dest, blob* src){
-   dest->meta = (uint8_t*)malloc(sizeof(uint8_t)*src->meta_size);
+   if (src->meta_size > 0) {
+      dest->meta = (uint8_t*)malloc(sizeof(uint8_t)*src->meta_size);
+   }
    dest->meta_size = src->meta_size;
    memcpy(dest->meta, src->meta, src->meta_size);
 }
