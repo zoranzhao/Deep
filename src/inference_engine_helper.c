@@ -4,6 +4,7 @@ cnn_model* load_cnn_model(char* cfg, char* weights){
    cnn_model* model = (cnn_model*)malloc(sizeof(cnn_model));
    network *net = load_network(cfg, weights, 0);
    set_batch_network(net, 1);
+   free(net->truth);
    net->truth = 0;
    net->train = 0;
    net->delta = 0;
@@ -345,9 +346,6 @@ void forward_partition(cnn_model* model, uint32_t task_id, bool is_reuse){
 
 void draw_object_boxes(cnn_model* model, uint32_t id){
    network net = *(model->net);
-   image sized;
-   sized.w = net.w; sized.h = net.h; sized.c = net.c;
-   load_image_by_number(&sized, id);
    image **alphabet = load_alphabet();
    list *options = read_data_cfg((char*)"data/coco.data");
    char *name_list = option_find_str(options, (char*)"names", (char*)"data/names.list");
@@ -378,7 +376,15 @@ void draw_object_boxes(cnn_model* model, uint32_t id){
    if (l.coords > 4){
       free_ptrs((void **)masks, l.w*l.h*l.n);
    }
+   int i, j;
+   const int nsize = 8;
+   for(j = 0; j < nsize; ++j){
+       for(i = 32; i < 127; ++i){
+           free_image(alphabet[j][i]);
+       }
+       free(alphabet[j]);
+
+   }
+   free(alphabet);
    free_image(im);
 }
-
-
